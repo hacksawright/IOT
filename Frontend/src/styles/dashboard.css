@@ -1,0 +1,81 @@
+.dashboard { display: flex; flex-direction: column; gap: 20px; }
+
+/* ----- Thẻ chỉ số ----- */
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.metric-card { padding: 20px 22px 22px; }
+.metric-card__top { display: flex; align-items: center; justify-content: space-between; color: var(--text-dim); }
+.metric-card__icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: grid; place-items: center;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+}
+.metric-card__value { font-family: var(--font-mono); font-size: 34px; font-weight: 700; margin: 14px 0 16px; letter-spacing: -0.5px; }
+.metric-card__unit { font-size: 14px; font-weight: 500; color: var(--text-dim); margin-left: 4px; }
+.progress { height: 4px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.progress > span { display: block; height: 100%; border-radius: 99px; background: var(--c); transition: width 0.6s ease; }
+
+/* ----- Biểu đồ ----- */
+.chart-box { width: 100%; min-height: 280px; }
+
+/* ----- Bố cục 2 cột ----- */
+.grid-2 { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); }
+
+/* ----- Thống kê cảm biến ----- */
+.stat-block + .stat-block { margin-top: 26px; }
+.stat-block__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.stat-block__name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.stat-block__name svg { color: var(--c); }
+.status-pill {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 4px 9px; border-radius: 5px;
+}
+.status-pill--ok { color: var(--green); background: rgba(34, 209, 123, 0.14); }
+.status-pill--warn { color: var(--amber); background: rgba(246, 176, 30, 0.14); }
+.stat-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.stat-values__label { font-size: 12px; color: var(--text-faint); margin-bottom: 4px; }
+.stat-values__num { font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+.stat-values__num small { font-size: 12px; font-weight: 500; color: var(--text-dim); margin-left: 2px; }
+.range { position: relative; height: 6px; border-radius: 99px; background: var(--border); margin: 16px 0 8px; }
+.range__safe { position: absolute; top: 0; bottom: 0; border-radius: 99px; background: var(--c); opacity: 0.85; }
+.range__marker { position: absolute; top: -4px; width: 2px; height: 14px; background: var(--c); border-radius: 2px; transform: translateX(-1px); transition: left 0.6s ease; }
+.range__labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+
+/* ----- Cảnh báo đang mở ----- */
+.alert-box {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-radius: 8px; border: 1px solid;
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 8%, transparent);
+  border-color: color-mix(in srgb, var(--c) 35%, transparent);
+}
+.alert-box + .alert-box { margin-top: 12px; }
+.alert-box__label { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.alert-box__count { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
+.alert-ai { display: flex; align-items: center; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 13px; }
+.alert-ai svg { color: var(--cyan); flex-shrink: 0; }
+
+/* ----- Sự kiện gần đây ----- */
+.event-list { list-style: none; margin: 0; padding: 0; }
+.event { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-top: 1px solid var(--border); }
+.event:first-child { border-top: 0; padding-top: 0; }
+.event svg { color: var(--c); flex-shrink: 0; }
+.event__time { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--c); flex-shrink: 0; }
+.event__text { color: var(--text-dim); }
+
+/* ----- Trạng thái thiết bị ----- */
+.device-list { list-style: none; margin: 0; padding: 0; }
+.device { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border); }
+.device:first-child { border-top: 0; padding-top: 0; }
+.device__name { font-weight: 600; }
+.device__type { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+.device__right { display: flex; align-items: center; gap: 8px; }
+.device__status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--c); }
+.device__status i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.chip { font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+.chip--on { color: var(--green); background: rgba(34, 209, 123, 0.14); }
+.chip--off { color: var(--text-faint); background: rgba(141, 153, 181, 0.12); }
+
+@media (max-width: 1100px) {
+  .grid-2 { grid-template-columns: minmax(0, 1fr); }
+}

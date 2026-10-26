@@ -1,0 +1,10 @@
+import { get, post, patch } from './client';
+export const list = (params) => get('/devices', params);
+export const getDetail = (id) => get(`/devices/${id}`);
+export const create = (body) => post('/devices', body);
+export const update = (id, body) => patch(`/devices/${id}`, body);
+export const changeLifecycle = (id, to) => post(`/devices/${id}/lifecycle`, { to });
+export const sendCommand = (id, turn_on) => post(`/devices/${id}/commands`, { turn_on });
+export const updateConfig = (id, config) => patch(`/devices/${id}/config`, { config });
+export const listCommands = (id, params) => get(`/devices/${id}/commands`, params);
+export const getReadings = (id, params) => get(`/devices/${id}/readings`, params);

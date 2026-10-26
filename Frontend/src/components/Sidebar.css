@@ -1,0 +1,54 @@
+.sidebar {
+  width: 246px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0f1d;
+  border-right: 1px solid var(--border);
+}
+.sidebar__brand { display: flex; align-items: center; gap: 12px; padding: 22px 20px; border-bottom: 1px solid var(--border); }
+.sidebar__logo { width: 32px; height: 32px; border-radius: 8px; background: var(--cyan); color: #04101c; display: grid; place-items: center; flex-shrink: 0; }
+.sidebar__name { font-weight: 700; font-size: 15px; }
+.sidebar__nav { display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; }
+.sidebar__link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 8px;
+  color: var(--text-dim); text-decoration: none; font-weight: 500;
+  border: 1px solid transparent;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar__link:hover { background: rgba(255, 255, 255, 0.04); color: var(--text); }
+.sidebar__link.active { background: #14213d; color: var(--cyan); border-color: #1d3157; }
+.sidebar__label { flex: 1; }
+.sidebar__badge {
+  min-width: 20px; padding: 1px 7px; border-radius: 6px; text-align: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--red); background: rgba(255, 77, 94, 0.16);
+}
+
+/* Màn hình hẹp: chỉ hiện icon */
+@media (max-width: 860px) {
+  .sidebar { width: 68px; }
+  .sidebar__brand { justify-content: center; padding: 18px 0; }
+  .sidebar__name, .sidebar__label { display: none; }
+  .sidebar__link { justify-content: center; padding: 12px 0; position: relative; }
+  .sidebar__badge { position: absolute; top: 4px; right: 6px; min-width: 16px; padding: 0 4px; font-size: 10px; }
+}
+.sidebar__brand { align-items: center; }
+.sidebar__brand > div:last-child { min-width: 0; display: flex; flex-direction: column; }
+.sidebar__version { margin-top: 2px; color: #53678b; font-family: var(--font-mono); font-size: 10px; }
+.sidebar__footer { margin-top: auto; padding: 16px 16px 18px; border-top: 1px solid var(--border); }
+.sidebar__eyebrow { display: block; margin-bottom: 12px; color: #4e6388; font-family: var(--font-mono); font-size: 9px; letter-spacing: 1px; }
+.sidebar__current-user { display: flex; align-items: center; gap: 9px; padding: 10px; border: 1px solid #233653; border-radius: 7px; background: #101a2d; }
+.sidebar__avatar { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #06121c; background: var(--cyan); font-size: 12px; font-weight: 700; }
+.sidebar__current-user > div { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sidebar__current-user strong { color: #dbe7f7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.sidebar__current-user small { color: #8298bc; font-size: 10px; text-transform: capitalize; }
+.sidebar__logout { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px; margin-top: 9px; padding: 8px; border: 1px solid transparent; border-radius: 5px; color: #8398bc; background: transparent; font: inherit; font-size: 11px; cursor: pointer; }
+.sidebar__logout:hover { color: #ff7784; border-color: rgba(255,77,94,.2); background: rgba(255,77,94,.06); }
+@media (max-width: 860px) { .sidebar__footer { padding: 12px 5px; }.sidebar__eyebrow,.sidebar__current-user > div { display: none; }
+  .sidebar__logout { width: 100%; min-height: 34px; padding: 8px 0; font-size: 0; }
+  .sidebar__logout svg { flex-shrink: 0; }.sidebar__current-user { justify-content: center; padding: 6px 0; border: 0; background: transparent; }.sidebar__avatar { width: 29px; height: 29px; }.sidebar__version { display: none; } }

@@ -1,0 +1,76 @@
+:root {
+  --bg: #070b14;
+  --surface: #0d1322;
+  --surface-2: #111a2e;
+  --border: #1b2742;
+  --text: #e8edf7;
+  --text-dim: #8d99b5;
+  --text-faint: #5c6a8a;
+  --cyan: #19c3ff;
+  --orange: #ff6a3d;
+  --green: #22d17b;
+  --amber: #f6b01e;
+  --red: #ff4d5e;
+  --radius: 12px;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell { display: flex; min-height: 100%; }
+.app-main { flex: 1; min-width: 0; padding: 28px 32px 40px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.card-title { margin: 0; font-size: 16px; font-weight: 600; }
+.muted-mono { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); }
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.page-header h1 { margin: 0; font-size: 26px; font-weight: 700; }
+.page-header p { margin: 6px 0 0; color: var(--text-dim); }
+.page-header__actions { display: flex; align-items: center; gap: 12px; }
+
+.live-indicator { display: flex; align-items: center; gap: 12px; }
+.live-clock { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); }
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 209, 123, 0.45);
+  background: rgba(34, 209, 123, 0.1);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 600;
+}
+.live-badge__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.placeholder { color: var(--text-dim); text-align: center; padding: 64px 24px; }
+
+@media (max-width: 860px) {
+  .app-main { padding: 20px 16px 32px; }
+}

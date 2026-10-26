@@ -1,0 +1,38 @@
+# Ví dụ ACL cho Mosquitto. Đổi prefix, username và nodeCode theo dự án của bạn.
+# ACL chỉ có hiệu lực nếu broker bật xác thực và nạp file ACL này.
+# Ví dụ phần liên quan trong mosquitto.conf:
+#   allow_anonymous false
+#   password_file /etc/mosquitto/passwd
+#   acl_file /etc/mosquitto/acl
+#   max_packet_size 8388608
+# Tạo tài khoản bằng mosquitto_passwd; không commit password file thật vào Git.
+
+# Tài khoản backend: đọc telemetry/heartbeat/status/ACK từ mọi Node,
+# kết quả AI từ topic riêng, và chỉ publish command/config xuống Node.
+user agri_backend
+topic read agri/+/telemetry
+topic read agri/+/heartbeat
+topic read agri/+/status
+topic read agri/+/command/ack
+topic read agri/+/config/ack
+topic read agri/ai/result
+topic write agri/+/command
+topic write agri/+/config
+
+# Tài khoản publisher bên thứ ba: chỉ được gửi kết quả nhận diện + ảnh.
+user external_ai
+topic write agri/ai/result
+
+# Tài khoản riêng cho Node NODE-01.
+user NODE-01
+topic write agri/NODE-01/telemetry
+topic write agri/NODE-01/heartbeat
+topic write agri/NODE-01/status
+topic write agri/NODE-01/command/ack
+topic write agri/NODE-01/config/ack
+topic read agri/NODE-01/command
+topic read agri/NODE-01/config
+
+# Tạo block tương tự cho từng Node.
+# Không cấp cho Node quyền write agri/+/command/ack hoặc topic của Node khác.
+# Nếu MQTT_TOPIC_PREFIX khác agri, thay prefix nhất quán trong ACL và publisher.

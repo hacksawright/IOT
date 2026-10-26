@@ -1,0 +1,8 @@
+node_modules/
+.env
+src/.env
+*.log
+.DS_Store
+
+# Ảnh thực tế nhận từ dịch vụ AI (không đưa ảnh runtime vào Git)
+storage/analysis-images/
