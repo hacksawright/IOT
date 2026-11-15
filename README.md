@@ -11,7 +11,7 @@ Nếu database mới/trống và bạn muốn nạp dữ liệu demo, chạy scr
 mysql -u root -p < Backend/database/smart_agri_mysql_demo.sql
 ```
 
-Script tạo database `iot`, tạo 11 bảng theo các model Sequelize và thêm tài khoản, Node/thiết bị, telemetry 24 giờ gần nhất, danh mục bệnh/phác đồ demo, lịch sử AI, cảnh báo, lệnh và audit log. Tài khoản mẫu dùng chung mật khẩu `Demo@12345678`: `admin`, `operator1`, `operator2`, `viewer1`, `viewer2`. Chỉ dùng local và đổi/xóa tài khoản demo trước khi deploy.
+Script tạo database `iot`, tạo 12 bảng theo các model Sequelize và thêm tài khoản, Node/thiết bị, telemetry 24 giờ gần nhất, danh mục bệnh/phác đồ demo, lịch sử AI, cảnh báo, lệnh và audit log. Tài khoản mẫu dùng chung mật khẩu `Demo@12345678`: `admin`, `operator1`, `operator2`, `viewer1`, `viewer2`. Chỉ dùng local và đổi/xóa tài khoản demo trước khi deploy.
 
 Gói demo kèm ảnh minh họa tại `Backend/storage/analysis-images/demo-late-blight.jpg`; hãy giữ file này để liên kết `imagePath` của bản ghi AI mẫu hoạt động. Trong `Backend/.env`, đặt `DB_NAME=iot`, đúng `DB_USER`/`DB_PASSWORD`; khi chỉ kiểm tra UI có thể tạm đặt `MQTT_ENABLED=false`. Dữ liệu/phác đồ là dữ liệu giả lập, không dùng làm khuyến cáo nông nghiệp thực tế.
 
@@ -19,7 +19,7 @@ Gói demo kèm ảnh minh họa tại `Backend/storage/analysis-images/demo-late
 
 1. Cài MySQL và tạo database, ví dụ `iot`.
 2. Mở `Backend/.env.example`, sao chép thành `Backend/.env`.
-3. Điền `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`; cấu hình MQTT (`MQTT_URL`, `MQTT_USERNAME`, `MQTT_PASSWORD`, `MQTT_TOPIC_PREFIX`) và thay `JWT_SECRET` bằng chuỗi ngẫu nhiên dài. Đặt `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_FULL_NAME`, `BOOTSTRAP_ADMIN_PASSWORD` (mật khẩu ít nhất 12 ký tự).
+3. Điền `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`; cấu hình MQTT và thay `JWT_SECRET` bằng chuỗi ngẫu nhiên dài. Nếu quản lý Node ESP32 thật, bật Mosquitto Dynamic Security trước, rồi cấu hình `MQTT_DYNSEC_ENABLED=true`, `MQTT_DYNSEC_ADMIN_USERNAME/PASSWORD` và tài khoản Backend `MQTT_USERNAME/PASSWORD` theo `Backend/docs/mosquitto-acl.example`. Đặt `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_FULL_NAME`, `BOOTSTRAP_ADMIN_PASSWORD` (mật khẩu ít nhất 12 ký tự).
 4. Cài dependencies và khởi tạo schema + tài khoản Admin:
 
 ```bash
@@ -50,10 +50,10 @@ Lần cài đầu hãy dùng `npm install` (không dùng `npm ci`) để đồng
 
 - **Login:** `/api/auth/login`, khôi phục session qua `/api/auth/me`, JWT gắn vào API; trang được bảo vệ khi chưa đăng nhập.
 - **Dashboard:** `/api/dashboard/summary`, `/api/dashboard/telemetry`, devices/alerts/analyses APIs và Socket.IO (`reading`, `alert:new`, `alert:update`, `device:update`, `analysis:new`, `node:status`). Không còn số liệu telemetry sinh ngẫu nhiên.
-- **Thiết bị:** danh sách thật, lọc trạng thái, xem panel chi tiết, telemetry mới nhất, lịch sử lệnh, lệnh bật/tắt bơm có ACK, cấu hình tự động, lifecycle và tạo/sửa thiết bị theo quyền.
-- **Node ESP32:** danh sách, tạo/cập nhật, trạng thái heartbeat realtime và thu hồi Node (Admin).
+- **Thiết bị:** đăng ký theo danh sách phần cứng đã lắp và báo cáo Firmware v1.2; hỗ trợ SENSOR, PUMP, FAN, cấu hình metric, hiển thị telemetry và điều khiển bơm/quạt. Không tạo cấu hình còi/LED. API probe cũ chỉ dành cho firmware đời trước.
+- **Node ESP32:** mỗi Node có username/password MQTT và ACL role riêng được tạo tự động trên Mosquitto Dynamic Security; Backend tạo MQTT account/ACL ngay khi Admin tạo Node; đồng thời cấp `provisioningToken` một lần để ESP32 claim MQTT credential trực tiếp. Admin có thể cấp lại provisioningToken, cấp lại mật khẩu MQTT, thu hồi và khôi phục tài khoản. Backend chỉ nhận telemetry/ACK và gửi lệnh khi tài khoản Node đang bật; Node chỉ Online sau heartbeat mới.
 - **Người dùng:** tạo/sửa/kích hoạt/khóa tài khoản, ma trận RBAC, gán thiết bị, hai chế độ xem theo người dùng/theo thiết bị (Admin).
-- **Cảnh báo:** lọc theo trạng thái/mức độ/loại, xác nhận và xử lý, cập nhật realtime.
+- **Cảnh báo:** lọc theo trạng thái/mức độ/loại, xác nhận và xử lý, cập nhật realtime. Telemetry ACTIVE mới sinh `sensor_threshold` theo ngưỡng cấu hình; hệ thống dùng hysteresis để tránh nhấp nháy và tự đóng khi số đo phục hồi.
 - **AI chẩn đoán:** lịch sử kết quả MQTT, ảnh tải qua API có JWT, độ tin cậy, model và điều trị sinh học/hóa học.
 - **Audit Log:** bộ lọc và phân trang theo API, chỉ Admin.
 
@@ -61,11 +61,44 @@ Backend vẫn là nơi thực thi quyền truy cập; ẩn trang ở frontend ch
 
 ## 4. Dữ liệu còn cần cấu hình để chạy end-to-end
 
-- Tạo Node và thiết bị trong giao diện Admin; gán thiết bị vào Node, cấu hình firmware/ACL MQTT phù hợp với `Backend/docs/mosquitto-acl.example`.
+- Bật Dynamic Security cho Mosquitto và tạo tài khoản riêng cho Backend theo `Backend/docs/mosquitto-acl.example`; sau đó tạo Node trong Web Admin. Backend tạo sẵn MQTT account và ACL role riêng cho từng Node, nhưng không hiển thị MQTT password trong giao diện. Gửi `provisioningToken` một lần cho người phụ trách lắp đặt; ESP32 dùng token gọi `/api/device-provisioning/claim` để nhận MQTT credential, không nhập MQTT username/password thủ công.
+- Khi chạy local, Backend dùng `MQTT_URL=mqtt://localhost:1883` để kết nối Broker trên máy tính; đồng thời đặt `MQTT_DEVICE_URL=mqtt://<IP-LAN-máy-tính>:1883` để Backend trả đúng địa chỉ Broker mà ESP32 truy cập được. Không trả `localhost` cho Firmware.
 - Cấp danh mục `Disease` và `Treatment` trước khi bên thứ ba gửi kết quả AI; backend phải map nhãn AI về bệnh trong danh mục.
 - Bên AI publish JSON kết quả có `eventId`, tên/nhãn bệnh, confidence, thời gian và `imageBase64` lên `{MQTT_TOPIC_PREFIX}/ai/result`.
-- Khi firmware ESP32 bắt đầu publish heartbeat/telemetry và trả ACK đúng topic, trạng thái thiết bị/telemetry/lệnh sẽ cập nhật thật.
+- Với Firmware Telemetry v1.2, đăng ký cảm biến/bơm/quạt theo danh sách phần cứng đã lắp; Firmware không có lệnh `device/probe`. Backend sinh `deviceCode` cho hồ sơ, còn `nodeCode` mới có dạng `NODE-001`, `NODE-002`... theo ID tự tăng; các Node demo/cũ giữ nguyên mã cũ. Firmware nhận nodeCode từ provisioning response. Các Node có sẵn từ SQL demo chưa có principal trong Broker; Admin gọi `POST /api/nodes/:id/provisioning-token` để Backend khởi tạo MQTT account nếu còn thiếu và cấp provisioningToken cho Node đó trước khi dùng ESP32 thật. Loại thiết bị hỗ trợ: SENSOR, PUMP, FAN; còi/đèn không được đăng ký trong cấu hình hiện tại.
+- Nếu database đã tồn tại từ bản trước, chạy mỗi migration còn thiếu đúng một lần. Chạy các migration còn thiếu theo thứ tự phụ thuộc: `20261027_device_probe_lifecycle.sql`, `20261027_device_lifecycle_timestamp.sql`, `20261027_simplify_device_evidence.sql`, `20261026_external_ai_result_images.sql`, `20261027_firmware_v12_fan_node_restore.sql`, rồi `20261102_node_mqtt_accounts_explicit_activation.sql`. Không chạy lại migration đã áp dụng. Migration firmware bổ sung loại `FAN`, boot counter/uptime và khóa chống trùng theo seq. Migration `20261102_node_mqtt_accounts_explicit_activation.sql` bổ sung tài khoản MQTT ở cấp Node và trường chờ ACK kích hoạt Device. Chạy thêm `20261115_node_provisioning_tokens.sql` sau các migration trên để tạo bảng token provisioning. Chỉ chạy mỗi migration một lần trên DB hiện có, sau khi backup. Schema demo mới đã có các cột tương ứng.
+- Đăng ký thiết bị trong trang Admin theo đúng GPIO và metric trong `Backend/docs/FIRMWARE_V12_INTEGRATION.md`. `nodeCode` được ESP32 nhận từ API provisioning sau khi claim token thành công; không cần nhập thủ công trong captive portal. Firmware v1.2 không có `device/probe`; không dùng quy trình probe cũ để đăng ký phần cứng thật.
 
-## 5. Kiểm thử và giới hạn xác nhận
+## 5. Cảnh báo ngưỡng và xác thực JWT
 
-Bộ test backend được chạy trong quá trình đóng gói: **21/21 test PASS** cho kiểm tra ACK, payload kết quả AI và lưu ảnh. Toàn bộ JS/JSX frontend đã được parse kiểm tra cú pháp. Không thể xác nhận build Vite trong môi trường đóng gói này vì `node_modules` lấy từ ZIP nguồn thiếu native binding tương thích Linux; gói xuất không kèm `node_modules`, vì vậy cần chạy `npm install` trên máy phát triển của bạn để cài đúng binary cho hệ điều hành. Chưa thể kiểm thử kết nối thật với MySQL/MQTT broker/Node/AI do chưa có cấu hình và thiết bị thực tế.
+- Mặc định: `SOIL_MOISTURE` cảnh báo thấp dưới 25% (hết cảnh báo từ 30%) hoặc cao trên 85% (hết từ 80%); `AIR_TEMPERATURE` thấp dưới 5°C (hết từ 8°C) hoặc cao trên 38°C (hết từ 35°C); `AIR_HUMIDITY` thấp dưới 25% (hết từ 30%) hoặc cao trên 90% (hết từ 85%). Đây là ngưỡng demo, hãy điều chỉnh theo cây trồng/cảm biến của bạn. `AIR_TEMPERATURE` cao từ 40°C được nâng lên CRITICAL.
+- Có thể ghi đè ngưỡng mặc định qua `SENSOR_THRESHOLD_RULES_JSON` trong `Backend/.env`, hoặc đặt `config.alertThresholds` khi cập nhật cấu hình của thiết bị. Hysteresis giữ cảnh báo mở cho đến khi chạm ngưỡng phục hồi. Chỉ telemetry mới của cảm biến ACTIVE mới được đánh giá; telemetry backfill không tạo cảnh báo hồi tố.
+- Firmware prefix mặc định là `sf` qua `MQTT_FIRMWARE_TOPIC_PREFIX`; prefix AI hiện tại vẫn là `iot` qua `MQTT_TOPIC_PREFIX`. Topics chính: Node → Backend `sf/{nodeCode}/telemetry`, `telemetry/backfill`, `heartbeat`, `status`, `config`, `cmd/ack`; Backend → Node `sf/{nodeCode}/cmd`. Nếu đổi một trong hai prefix, phải sửa ACL tương ứng. Topic `device/probe` chỉ còn cho firmware đời cũ.
+- JWT là stateless, chứa `sub` và `role`, có thời hạn theo `JWT_EXPIRES_IN`. Frontend lưu token trong `localStorage` và xóa token khi đăng xuất. Đổi mật khẩu hoặc đổi vai trò không tự vô hiệu hóa JWT đã phát; token đã bị sao chép có thể dùng đến khi hết hạn, nhưng trạng thái tài khoản và quyền truy cập vẫn được kiểm tra ở backend.
+
+## 6. Vòng đời thiết bị
+
+Sơ đồ đầy đủ và ví dụ từng nhánh nằm trong `Backend/docs/DEVICE_LIFECYCLE.md`. Điểm quan trọng: lifecycle (`REGISTERED`, `PROVISIONED`, `ACTIVE`, `FAULT`, `MAINTENANCE`, `DECOMMISSIONED`) là trạng thái nghiệp vụ của thiết bị; online/offline là trạng thái kết nối của Node ESP32, hai trục này độc lập. `PROVISIONED` là đã cấu hình, gán Node và ít nhất một người quản lý. Chỉ Admin chủ động gửi lệnh `lifecycle ACTIVE`; Backend chỉ ghi `ACTIVE` sau ACK thành công từ Firmware (Firmware cần `REQUIRE_ACTIVATION = 1`). Heartbeat không tự kích hoạt Device. Một Node offline không tự biến Device thành `DECOMMISSIONED`.
+
+Bản cập nhật dùng `lifecycleChangedAt` để ghi nhận lần chuyển trạng thái và `pendingLifecycleCommandUuid/To/SentAt` để đối chiếu ACK kích hoạt. `stateChangedAt` chỉ dùng cho thay đổi đầu ra như bật/tắt bơm. Khi broker kết nối lại, Backend thử gửi lại cấu hình chưa được ACK (cùng version, firmware cần xử lý idempotent). Nếu ACK bật bơm đến muộn sau khi lifecycle rời `ACTIVE`, Backend ghi nhận ACK rồi phát lệnh tắt an toàn.
+
+## 7. Phạm vi firmware và hợp đồng tích hợp
+
+Gói này chỉ gồm Frontend + Backend, không chứa source firmware ESP32. Hợp đồng đang đối chiếu theo báo cáo Firmware v1.2 nằm trong `Backend/docs/FIRMWARE_V12_INTEGRATION.md`. Báo cáo không liệt kê đầy đủ tên key JSON cho mọi lệnh/ACK; các key cấu hình được đề xuất trong tài liệu cần được xác nhận với parser firmware thực tế trước khi nghiệm thu.
+
+## 8. Kiểm thử và giới hạn xác nhận
+
+Sau khi giải nén, chạy `npm install` trong `Backend` và `Frontend`; trong Backend chạy `npm run test:security`, trong Frontend chạy `npm run build`. Gói không chứa `node_modules`. MQTT, MySQL và phần cứng thật chưa được nghiệm thu đầu-cuối trong tài liệu này; cần chạy kiểm thử với broker và ESP32 thật trước khi demo.
+
+## Identifier generation
+
+- `nodeCode` do Backend cấp khi Admin tạo Node. ESP32 nhận mã này từ provisioning response và dùng làm `{nodeCode}` trong topic MQTT `sf/{nodeCode}/...`; không nhập thủ công.
+- `deviceCode` mới có dạng `DEV-001`, `DEV-002`... theo ID tự tăng; các mã cũ được giữ nguyên; telemetry phẳng của firmware được ánh xạ qua `config.metrics`, không yêu cầu ESP32 publish `deviceCode` cho từng số đo.
+- MQTT username/password là credential riêng của từng Node, không phải `nodeCode`; Backend không lưu password rõ trong MySQL. Xem `Backend/docs/mosquitto-acl.example`.
+
+
+## Camera HTTP image ingestion (Cloudinary)
+
+Camera/Agent gửi ảnh trực tiếp tới `POST /api/camera/media` bằng `multipart/form-data` (`metadata` JSON + `file`) và `Authorization: Bearer <camera-token>`. Admin cấp token một lần qua `POST /api/camera/tokens/:cameraId`; server chỉ lưu hash token. Backend gọi AI API, upload ảnh lên Cloudinary, rồi lưu kết quả AI cùng `imageUrl`, `cloudinaryPublicId`, `imageSha256` vào `leafAnalyses`. Xem `Backend/docs/CAMERA_HTTP_CLOUDINARY_FLOW.md`.
+
+Cần cấu hình `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `AI_API_URL`, `AI_API_KEY`. Với database đã tồn tại, chạy `Backend/database/migrations/20261115_camera_http_cloudinary.sql`.

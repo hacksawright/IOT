@@ -1,12 +1,12 @@
 const env = require('./env');
 
-const PREFIX = env.mqtt.prefix; // mặc định "agri"
+const PREFIX = env.mqtt.firmwarePrefix; // firmware mặc định "sf"
 
 // ---- Tùy chọn kết nối tới broker (truyền vào mqtt.connect) ----
 const connectOptions = {
     username: env.mqtt.username || undefined,
     password: env.mqtt.password || undefined,
-    clientId: `agri-backend-${process.pid}`, // mỗi tiến trình một clientId, tránh bị broker đá nhau
+    clientId: `iot-backend-${process.pid}`, // mỗi tiến trình một clientId, tránh bị broker đá nhau
     clean: true,
     keepalive: 30,
     reconnectPeriod: 3000,   // tự nối lại sau 3 giây
@@ -21,28 +21,29 @@ const connectOptions = {
 };
 
 // ---- Topic quy ước ----
-// AI bên ngoài → server : {prefix}/ai/result (JSON + ảnh Base64)
-// node → server : {prefix}/{node_code}/telemetry | heartbeat | status | command/ack | config/ack
-// server → node : {prefix}/{node_code}/command   | config
+// Firmware Telemetry v1.2: sf/<nodeCode>/telemetry, telemetry/backfill, heartbeat, status, config, cmd/ack
+// Server → firmware: sf/<nodeCode>/cmd (action pump/fan/config/lifecycle/...)
 const subscribeTopics = [
     `${PREFIX}/+/telemetry`,
+    `${PREFIX}/+/telemetry/backfill`,
+    `${PREFIX}/+/config`,
     `${PREFIX}/+/heartbeat`,
     `${PREFIX}/+/status`,
+    `${PREFIX}/+/cmd/ack`,
     `${PREFIX}/+/command/ack`,
     `${PREFIX}/+/config/ack`,
-    `${PREFIX}/ai/result`,
+    `${PREFIX}/+/device/probe/ack`,
 ];
 
 const topics = {
-    command: (nodeCode) => `${PREFIX}/${nodeCode}/command`,
+    command: (nodeCode) => `${PREFIX}/${nodeCode}/cmd`,
     config: (nodeCode) => `${PREFIX}/${nodeCode}/config`,
+    deviceProbe: (nodeCode) => `${PREFIX}/${nodeCode}/device/probe`,
     backendStatus: `${PREFIX}/_backend/status`,
-    aiResult: `${PREFIX}/ai/result`,
 };
 
-// "agri/NODE-01/command/ack" → { nodeCode: "NODE-01", kind: "command/ack" }
+// "sf/NODE-001/cmd/ack" → { nodeCode: "NODE-001", kind: "cmd/ack" }
 const parseTopic = (topic) => {
-    if (topic === `${PREFIX}/ai/result`) return { nodeCode: null, kind: 'ai/result' };
     const [, nodeCode, ...rest] = topic.split('/');
     return { nodeCode, kind: rest.join('/') };
 };

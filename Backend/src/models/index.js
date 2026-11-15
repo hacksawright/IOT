@@ -32,6 +32,8 @@ const Treatment = require('./treatment.model')(sequelize, DataTypes);
 const LeafAnalysis = require('./leafAnalysis.model')(sequelize, DataTypes);
 const Alert = require('./alert.model')(sequelize, DataTypes);
 const DeviceCommand = require('./deviceCommand.model')(sequelize, DataTypes);
+const ProvisioningToken = require('./provisioningToken.model')(sequelize, DataTypes);
+const CameraToken = require('./cameraToken.model')(sequelize, DataTypes);
 
 // ---------- Quan hệ: người dùng ----------
 // Nhật ký thao tác (xóa user thì giữ log, userId = NULL)
@@ -50,6 +52,10 @@ UserDevice.belongsTo(Device, { foreignKey: 'deviceId', as: 'device' });
 // Một node (ESP32) điều khiển nhiều thiết bị
 Node.hasMany(Device, { foreignKey: 'nodeId', as: 'devices', onDelete: 'RESTRICT' });
 Device.belongsTo(Node, { foreignKey: 'nodeId', as: 'node' });
+Node.hasOne(ProvisioningToken, { foreignKey: 'nodeId', as: 'provisioningToken', onDelete: 'CASCADE' });
+ProvisioningToken.belongsTo(Node, { foreignKey: 'nodeId', as: 'node' });
+Device.hasOne(CameraToken, { foreignKey: 'deviceId', as: 'cameraToken', onDelete: 'CASCADE' });
+CameraToken.belongsTo(Device, { foreignKey: 'deviceId', as: 'camera', onDelete: 'CASCADE' });
 
 // Dữ liệu cảm biến
 Device.hasMany(SensorReading, { foreignKey: 'deviceId', as: 'readings', onDelete: 'CASCADE' });
@@ -107,4 +113,6 @@ module.exports = {
   LeafAnalysis,
   Alert,
   DeviceCommand,
+  ProvisioningToken,
+  CameraToken,
 };
