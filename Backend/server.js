@@ -22,7 +22,7 @@ async function syncDatabase() {
 
 async function main() {
     await sequelize.authenticate();
-    console.log(`[db] đã kết nối ${env.db.dialect}`);
+    console.log(`[db] đã kết nối MySQL (${env.db.name})`);
     await syncDatabase();
 
     const server = http.createServer(app);

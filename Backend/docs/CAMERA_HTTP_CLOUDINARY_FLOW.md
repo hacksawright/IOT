@@ -19,6 +19,27 @@
 
 ## API
 
+### Tải ảnh trực tiếp từ giao diện người dùng
+
+Người dùng đã đăng nhập có thể tải một ảnh lên `POST /api/analyses/predict`. Backend kiểm tra ảnh rồi gửi `multipart/form-data` đến `AI_API_URL/predict` với header `X-API-Key`, sau đó trả JSON dự đoán cho giao diện. Trường `AI_API_URL` là URL gốc của AI server, không thêm `/predict`.
+
+```bash
+curl -X POST "http://localhost:3000/api/analyses/predict" \
+  -H "Authorization: Bearer <user-jwt>" \
+  -F "file=@leaf.jpg;type=image/jpeg"
+```
+
+Ảnh hỗ trợ JPEG/PNG/WebP, tối đa 10 MB. Backend lưu ảnh vào `AI_IMAGE_STORAGE_DIR` (mặc định `Backend/storage/analysis-images`), ghi kết quả vào `leafAnalyses`, và chỉ cho người tải lên xem lịch sử/ảnh đó (Admin xem được tất cả). Ảnh được phục vụ qua API có JWT, không phải thư mục public.
+
+Với database đã tồn tại, chạy `database/migrations/20261117_user_upload_analysis_history.sql` một lần trước khi thử; migration thêm quyền sở hữu lịch sử và ba nhãn AI của model Malabar. Database mới dùng schema và dữ liệu trong `database/smart_agri_mysql_demo.sql`.
+
+#### Kiểm tra luồng tải ảnh
+
+1. Cấu hình `AI_API_URL` bằng URL tunnel AI hiện tại (không kèm `/predict`) và `AI_API_KEY` bằng key cấu hình trên AI server; khởi động lại Backend.
+2. Đăng nhập frontend, mở **AI Chẩn Đoán**, chọn ảnh hợp lệ và bấm **Gửi ảnh phân tích**.
+3. Kết quả xuất hiện trên trang và trong lịch sử; chọn dòng vừa tạo để mở ảnh đã lưu.
+4. Kiểm tra DB bằng `SELECT id, eventId, uploadedBy, diseaseId, imagePath FROM leafAnalyses ORDER BY id DESC LIMIT 5;`.
+
 ### Đăng ký Camera
 
 `POST /api/camera` (JWT Admin):

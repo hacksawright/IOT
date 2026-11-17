@@ -231,6 +231,132 @@ button:disabled {
     flex-wrap: wrap;
 }
 
+.ai-upload-card {
+    margin-bottom: 20px;
+    padding: 18px;
+    border: 1px solid #23324f;
+    border-radius: 9px;
+    background: #10182a;
+}
+
+.ai-upload-heading h2 {
+    margin: 0 0 6px;
+    color: #dce7f7;
+    font-size: 15px;
+}
+
+.ai-upload-heading p,
+.ai-upload-footnote {
+    margin: 0;
+    color: #8da1c4;
+    font-size: 12px;
+}
+
+.ai-upload-form {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.ai-upload-form label {
+    display: flex;
+    flex: 1 1 280px;
+    flex-direction: column;
+    gap: 7px;
+    color: #9db0d0;
+    font-size: 12px;
+}
+
+.ai-upload-form input {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px;
+    border: 1px solid #263654;
+    border-radius: 6px;
+    color: #dce7f7;
+    background: #0c1220;
+}
+
+.ai-prediction-result {
+    max-width: 720px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #23324f;
+}
+
+.ai-prediction-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ai-prediction-main img {
+    width: 112px;
+    height: 112px;
+    border: 1px solid #263654;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.ai-prediction-main small {
+    color: #8da1c4;
+    font-size: 10px;
+    letter-spacing: .12em;
+}
+
+.ai-prediction-main h3 {
+    margin: 5px 0;
+    color: #e6eefb;
+}
+
+.ai-prediction-main p {
+    margin: 0 0 7px;
+    color: #8da1c4;
+    font-size: 12px;
+}
+
+.ai-prediction-main strong,
+.ai-prediction-main span {
+    display: block;
+    margin-top: 4px;
+}
+
+.ai-prediction-result h4 {
+    margin: 16px 0 8px;
+    color: #a9bad5;
+    font-size: 12px;
+}
+
+.ai-prediction-result ul {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.ai-prediction-result li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid #1d2b45;
+    color: #a9bad5;
+    font-size: 12px;
+}
+
+.ai-upload-footnote {
+    margin-top: 12px;
+}
+
+.ai-upload-spinner {
+    animation: ai-upload-spin 1s linear infinite;
+}
+
+@keyframes ai-upload-spin {
+    to { transform: rotate(360deg); }
+}
+
 .segmented-control {
     display: inline-flex;
     align-items: center;
